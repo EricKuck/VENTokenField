@@ -99,6 +99,7 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     // Accessing bare value to avoid kicking off a premature layout run.
     _toLabelText = NSLocalizedString(@"To:", nil);
 
+    [self layoutIfNeeded];
     self.originalHeight = CGRectGetHeight(self.frame);
 
     // Add invisible text field to handle backspace when we don't have a real first responder.
@@ -110,6 +111,10 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 
 - (void)collapse
 {
+    VENBackspaceTextField *textField = [self inputTextField];
+    if ([textField.text length]) {
+        [self.delegate tokenField:self didEnterText:textField.text];
+    }
     [self layoutCollapsedLabel];
 }
 
@@ -566,6 +571,12 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
+    if ([textField isKindOfClass:[VENBackspaceTextField class]] &&
+        [self isBackspacePressInTextField:textField range:range replacementString:string]) {
+        [self textFieldDidEnterBackspace:(VENBackspaceTextField *)textField];
+        return NO;
+    }
+
     [self unhighlightAllTokens];
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     for (NSString *delimiter in self.delimiters) {
@@ -583,6 +594,12 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     return YES;
 }
 
+- (BOOL)isBackspacePressInTextField:(UITextField *)textField range:(NSRange)range replacementString:(NSString *)string {
+    return textField.text.length == 0 &&
+    range.location == 0 &&
+    range.length == 0 &&
+    string.length == 0;
+}
 
 #pragma mark - VENBackspaceTextFieldDelegate
 
