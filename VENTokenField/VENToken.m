@@ -74,6 +74,9 @@
     [self setHighlighted:_highlighted];
 }
 
+- (void)setFont:(UIFont *)font {
+    self.titleLabel.font = font;
+}
 
 #pragma mark - Private
 

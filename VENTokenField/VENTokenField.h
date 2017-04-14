@@ -80,6 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic, nullable) NSString *placeholderText;
 @property (copy, nonatomic, nullable) NSString *inputTextFieldAccessibilityLabel;
 
+- (void)setFont:(UIFont *)font;
 - (void)setColorScheme:(UIColor *)color;
 
 @end

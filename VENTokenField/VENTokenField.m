@@ -39,6 +39,7 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 @property (strong, nonatomic) UIScrollView *scrollView;
 @property (strong, nonatomic) NSMutableArray *tokens;
 @property (assign, nonatomic) CGFloat originalHeight;
+@property (assign, nonatomic) CGFloat currentHeight;
 @property (strong, nonatomic) UITapGestureRecognizer *tapGestureRecognizer;
 @property (strong, nonatomic) VENBackspaceTextField *invisibleTextField;
 @property (strong, nonatomic) VENBackspaceTextField *inputTextField;
@@ -150,6 +151,12 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 {
     _toLabelText = toLabelText;
     [self reloadData];
+}
+
+- (void)setFont:(UIFont *)font {
+    self.inputTextField.font = font;
+    self.collapsedLabel.font = font;
+    self.toLabel.font = font;
 }
 
 - (void)setColorScheme:(UIColor *)color
@@ -305,6 +312,7 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     for (NSUInteger i = 0; i < [self numberOfTokens]; i++) {
         NSString *title = [self titleForTokenAtIndex:i];
         VENToken *token = [[VENToken alloc] init];
+        [token setFont:self.inputTextField.font];
 
         __weak VENToken *weakToken = token;
         __weak VENTokenField *weakSelf = self;
@@ -401,6 +409,15 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
             [self.delegate tokenField:self didChangeContentHeight:height];
         }
     }
+}
+
+- (void)setHeight:(CGFloat)height {
+    self.currentHeight = height;
+    [super setHeight:height];
+}
+
+- (CGSize)intrinsicContentSize {
+    return CGSizeMake(self.bounds.size.width, self.currentHeight);
 }
 
 - (VENBackspaceTextField *)inputTextField
