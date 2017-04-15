@@ -28,7 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (assign, nonatomic) BOOL highlighted;
 @property (copy, nonatomic, nullable) void (^didTapTokenBlock) (void);
-@property (strong, nonatomic) UIColor *colorScheme;
+@property (strong, nonatomic) UIColor *textColorNormal;
+@property (strong, nonatomic) UIColor *textColorHighlighted;
+@property (strong, nonatomic) UIColor *backgroundColorNormal;
+@property (strong, nonatomic) UIColor *backgroundColorHighlighted;
 
 - (void)setTitleText:(NSString *)text;
 - (void)setFont:(UIFont *)font;

@@ -39,7 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)tokenField:(VENTokenField *)tokenField titleForTokenAtIndex:(NSUInteger)index;
 - (NSUInteger)numberOfTokensInTokenField:(VENTokenField *)tokenField;
 - (NSString *)tokenFieldCollapsedText:(VENTokenField *)tokenField;
-- (UIColor *)tokenField:(VENTokenField *)tokenField colorSchemeForTokenAtIndex:(NSUInteger)index;
 @end
 
 
@@ -81,7 +80,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic, nullable) NSString *inputTextFieldAccessibilityLabel;
 
 - (void)setFont:(UIFont *)font;
-- (void)setColorScheme:(UIColor *)color;
+- (void)setColorSchemeWithNormalBackground:(UIColor *)normalBackground
+                                normalText:(UIColor *)normalText
+                     highlightedBackground:(UIColor *)highlightedBackground
+                           highlightedText:(UIColor *)highlightedText;
 
 @end
 

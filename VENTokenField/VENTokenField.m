@@ -43,8 +43,12 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 @property (strong, nonatomic) UITapGestureRecognizer *tapGestureRecognizer;
 @property (strong, nonatomic) VENBackspaceTextField *invisibleTextField;
 @property (strong, nonatomic) VENBackspaceTextField *inputTextField;
-@property (strong, nonatomic) UIColor *colorScheme;
 @property (strong, nonatomic) UILabel *collapsedLabel;
+
+@property (strong, nonatomic) UIColor *textColorNormal;
+@property (strong, nonatomic) UIColor *textColorHighlighted;
+@property (strong, nonatomic) UIColor *backgroundColorNormal;
+@property (strong, nonatomic) UIColor *backgroundColorHighlighted;
 
 @end
 
@@ -93,15 +97,20 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     self.horizontalInset = VENTokenFieldDefaultHorizontalInset;
     self.tokenPadding = VENTokenFieldDefaultTokenPadding;
     self.minInputWidth = VENTokenFieldDefaultMinInputWidth;
-    self.colorScheme = [UIColor blueColor];
+    self.textColorHighlighted = [UIColor whiteColor];
+    self.textColorNormal = [UIColor blueColor];
+    self.backgroundColorHighlighted = [UIColor clearColor];
+    self.backgroundColorHighlighted = [UIColor blueColor];
     self.toLabelTextColor = [UIColor colorWithRed:112/255.0f green:124/255.0f blue:124/255.0f alpha:1.0f];
     self.inputTextFieldTextColor = [UIColor colorWithRed:38/255.0f green:39/255.0f blue:41/255.0f alpha:1.0f];
     
     // Accessing bare value to avoid kicking off a premature layout run.
     _toLabelText = NSLocalizedString(@"To:", nil);
 
+    self.originalHeight = 44;
+    [self setHeight:44];
+
     [self layoutIfNeeded];
-    self.originalHeight = CGRectGetHeight(self.frame);
 
     // Add invisible text field to handle backspace when we don't have a real first responder.
     [self layoutInvisibleTextField];
@@ -159,13 +168,23 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     self.toLabel.font = font;
 }
 
-- (void)setColorScheme:(UIColor *)color
-{
-    _colorScheme = color;
-    self.collapsedLabel.textColor = color;
-    self.inputTextField.tintColor = color;
+- (void)setColorSchemeWithNormalBackground:(UIColor *)normalBackground
+                                normalText:(UIColor *)normalText
+                     highlightedBackground:(UIColor *)highlightedBackground
+                           highlightedText:(UIColor *)highlightedText {
+    self.backgroundColorNormal = normalBackground;
+    self.textColorNormal = normalText;
+    self.backgroundColorHighlighted = highlightedBackground;
+    self.textColorHighlighted = highlightedText;
+
+    self.collapsedLabel.textColor = highlightedBackground;
+    self.inputTextField.tintColor = highlightedBackground;
+
     for (VENToken *token in self.tokens) {
-        [token setColorScheme:color];
+        token.backgroundColorNormal = normalBackground;
+        token.textColorNormal = normalText;
+        token.backgroundColorHighlighted = highlightedBackground;
+        token.textColorHighlighted = highlightedText;
     }
 }
 
@@ -179,7 +198,6 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 {
     return self.inputTextField.text;
 }
-
 
 #pragma mark - View Layout
 
@@ -274,7 +292,7 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
         inputTextField.text = @"";
     }
     inputTextField.frame = CGRectMake(*currentX, *currentY + 1, inputTextFieldWidth, [self heightForToken] - 1);
-    inputTextField.tintColor = self.colorScheme;
+    inputTextField.tintColor = self.backgroundColorHighlighted;
     [self.scrollView addSubview:inputTextField];
 }
 
@@ -283,7 +301,7 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(*currentX, CGRectGetMinY(self.toLabel.frame), self.width - *currentX - self.horizontalInset, self.toLabel.height)];
     label.font = [UIFont fontWithName:@"HelveticaNeue" size:15.5];
     label.text = [self collapsedText];
-    label.textColor = self.colorScheme;
+    label.textColor = self.backgroundColorHighlighted;
     label.minimumScaleFactor = 5./label.font.pointSize;
     label.adjustsFontSizeToFitWidth = YES;
     [self addSubview:label];
@@ -320,8 +338,11 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
             [weakSelf didTapToken:weakToken];
         };
 
-        [token setTitleText:[NSString stringWithFormat:@"%@,", title]];
-        token.colorScheme = [self colorSchemeForTokenAtIndex:i];
+        [token setTitleText:title];
+        token.backgroundColorNormal = self.backgroundColorNormal;
+        token.textColorNormal = self.textColorNormal;
+        token.backgroundColorHighlighted = self.backgroundColorHighlighted;
+        token.textColorHighlighted = self.textColorHighlighted;
         
         [self.tokens addObject:token];
 
@@ -429,7 +450,7 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
         _inputTextField.font = [UIFont fontWithName:@"HelveticaNeue" size:15.5];
         _inputTextField.autocorrectionType = self.autocorrectionType;
         _inputTextField.autocapitalizationType = self.autocapitalizationType;
-        _inputTextField.tintColor = self.colorScheme;
+        _inputTextField.tintColor = self.backgroundColorHighlighted;
         _inputTextField.delegate = self;
         _inputTextField.backspaceDelegate = self;
         _inputTextField.placeholder = self.placeholderText;
@@ -525,15 +546,6 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     if (targetY > contentOffset.y) {
         [self.scrollView setContentOffset:CGPointMake(contentOffset.x, targetY) animated:NO];
     }
-}
-
-- (UIColor *)colorSchemeForTokenAtIndex:(NSUInteger)index {
-    
-    if ([self.dataSource respondsToSelector:@selector(tokenField:colorSchemeForTokenAtIndex:)]) {
-        return [self.dataSource tokenField:self colorSchemeForTokenAtIndex:index];
-    }
-    
-    return self.colorScheme;
 }
 
 #pragma mark - Data Source

@@ -44,15 +44,21 @@
 {
     self.backgroundView.layer.cornerRadius = 5;
     self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapToken:)];
-    self.colorScheme = [UIColor blueColor];
-    self.titleLabel.textColor = self.colorScheme;
+
+    self.textColorNormal = [UIColor blueColor];
+    self.backgroundColorNormal = [UIColor clearColor];
+
+    self.textColorHighlighted = [UIColor whiteColor];
+    self.backgroundColorHighlighted = [UIColor blueColor];
+
+    self.titleLabel.textColor = self.textColorNormal;
     [self addGestureRecognizer:self.tapGestureRecognizer];
 }
 
 - (void)setTitleText:(NSString *)text
 {
     self.titleLabel.text = text;
-    self.titleLabel.textColor = self.colorScheme;
+    self.titleLabel.textColor = self.textColorNormal;
     [self.titleLabel sizeToFit];
     self.frame = CGRectMake(CGRectGetMinX(self.frame), CGRectGetMinY(self.frame), CGRectGetMaxX(self.titleLabel.frame) + 3, CGRectGetHeight(self.frame));
     [self.titleLabel sizeToFit];
@@ -61,16 +67,27 @@
 - (void)setHighlighted:(BOOL)highlighted
 {
     _highlighted = highlighted;
-    UIColor *textColor = highlighted ? [UIColor whiteColor] : self.colorScheme;
-    UIColor *backgroundColor = highlighted ? self.colorScheme : [UIColor clearColor];
-    self.titleLabel.textColor = textColor;
-    self.backgroundView.backgroundColor = backgroundColor;
+    self.titleLabel.textColor = highlighted ? self.textColorHighlighted : self.textColorNormal;
+    self.backgroundView.backgroundColor = highlighted ? self.backgroundColorHighlighted : self.backgroundColorNormal;
 }
 
-- (void)setColorScheme:(UIColor *)colorScheme
-{
-    _colorScheme = colorScheme;
-    self.titleLabel.textColor = self.colorScheme;
+- (void)setTextColorNormal:(UIColor *)textColorNormal {
+    _textColorNormal = textColorNormal;
+    [self setHighlighted:_highlighted];
+}
+
+- (void)setTextColorHighlighted:(UIColor *)textColorHighlighted {
+    _textColorHighlighted = textColorHighlighted;
+    [self setHighlighted:_highlighted];
+}
+
+- (void)setBackgroundColorNormal:(UIColor *)backgroundColorNormal {
+    _backgroundColorNormal = backgroundColorNormal;
+    [self setHighlighted:_highlighted];
+}
+
+- (void)setBackgroundColorHighlighted:(UIColor *)backgroundColorHighlighted {
+    _backgroundColorHighlighted = backgroundColorHighlighted;
     [self setHighlighted:_highlighted];
 }
 
