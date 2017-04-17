@@ -241,6 +241,7 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     CGFloat currentY = 0;
 
     [self layoutToLabelInView:self.scrollView origin:CGPointZero currentX:&currentX];
+    currentX += self.tokenPadding;
     [self layoutTokensWithCurrentX:&currentX currentY:&currentY];
     [self layoutInputTextFieldWithCurrentX:&currentX currentY:&currentY clearInput:shouldAdjustFrame];
 
