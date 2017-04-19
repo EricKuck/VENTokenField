@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)tokenField:(VENTokenField *)tokenField titleForTokenAtIndex:(NSUInteger)index;
 - (NSUInteger)numberOfTokensInTokenField:(VENTokenField *)tokenField;
 - (NSString *)tokenFieldCollapsedText:(VENTokenField *)tokenField;
+- (BOOL)tokenField:(VENTokenField *)tokenField isInErrorStateAtIndex:(NSUInteger)index;
 @end
 
 
@@ -84,6 +85,10 @@ NS_ASSUME_NONNULL_BEGIN
                                 normalText:(UIColor *)normalText
                      highlightedBackground:(UIColor *)highlightedBackground
                            highlightedText:(UIColor *)highlightedText;
+- (void)setErrorStateColorSchemeWithNormalBackground:(UIColor *)normalBackground
+                                          normalText:(UIColor *)normalText
+                               highlightedBackground:(UIColor *)highlightedBackground
+                                     highlightedText:(UIColor *)highlightedText;
 
 @end
 

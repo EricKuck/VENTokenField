@@ -50,6 +50,11 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 @property (strong, nonatomic) UIColor *backgroundColorNormal;
 @property (strong, nonatomic) UIColor *backgroundColorHighlighted;
 
+@property (strong, nonatomic) UIColor *errorStateTextColorNormal;
+@property (strong, nonatomic) UIColor *errorStateTextColorHighlighted;
+@property (strong, nonatomic) UIColor *errorStateBackgroundColorNormal;
+@property (strong, nonatomic) UIColor *errorStateBackgroundColorHighlighted;
+
 @end
 
 
@@ -179,13 +184,16 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 
     self.collapsedLabel.textColor = highlightedBackground;
     self.inputTextField.tintColor = highlightedBackground;
+}
 
-    for (VENToken *token in self.tokens) {
-        token.backgroundColorNormal = normalBackground;
-        token.textColorNormal = normalText;
-        token.backgroundColorHighlighted = highlightedBackground;
-        token.textColorHighlighted = highlightedText;
-    }
+- (void)setErrorStateColorSchemeWithNormalBackground:(UIColor *)normalBackground
+                                          normalText:(UIColor *)normalText
+                               highlightedBackground:(UIColor *)highlightedBackground
+                                     highlightedText:(UIColor *)highlightedText {
+    self.errorStateBackgroundColorNormal = normalBackground;
+    self.errorStateTextColorNormal = normalText;
+    self.errorStateBackgroundColorHighlighted = highlightedBackground;
+    self.errorStateTextColorHighlighted = highlightedText;
 }
 
 - (void)setInputTextFieldAccessoryView:(UIView *)inputTextFieldAccessoryView
@@ -340,10 +348,19 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
         };
 
         [token setTitleText:title];
-        token.backgroundColorNormal = self.backgroundColorNormal;
-        token.textColorNormal = self.textColorNormal;
-        token.backgroundColorHighlighted = self.backgroundColorHighlighted;
-        token.textColorHighlighted = self.textColorHighlighted;
+
+        BOOL tokenIsInErrorState = [self.dataSource respondsToSelector:@selector(tokenField:isInErrorStateAtIndex:)] ? [self.dataSource tokenField:self isInErrorStateAtIndex:i] : NO;
+        if (tokenIsInErrorState && self.errorStateBackgroundColorHighlighted) {
+            token.backgroundColorNormal = self.errorStateBackgroundColorNormal;
+            token.textColorNormal = self.errorStateTextColorNormal;
+            token.backgroundColorHighlighted = self.errorStateBackgroundColorHighlighted;
+            token.textColorHighlighted = self.errorStateTextColorHighlighted;
+        } else {
+            token.backgroundColorNormal = self.backgroundColorNormal;
+            token.textColorNormal = self.textColorNormal;
+            token.backgroundColorHighlighted = self.backgroundColorHighlighted;
+            token.textColorHighlighted = self.textColorHighlighted;
+        }
         
         [self.tokens addObject:token];
 
