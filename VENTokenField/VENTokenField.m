@@ -393,6 +393,7 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     self.invisibleTextField = [[VENBackspaceTextField alloc] initWithFrame:CGRectZero];
     [self.invisibleTextField setAutocorrectionType:self.autocorrectionType];
     [self.invisibleTextField setAutocapitalizationType:self.autocapitalizationType];
+    self.invisibleTextField.delegate = self;
     self.invisibleTextField.backspaceDelegate = self;
     [self addSubview:self.invisibleTextField];
 }
@@ -600,6 +601,10 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
+    if (textField != self.inputTextField) {
+        return YES;
+    }
+
     if ([self.delegate respondsToSelector:@selector(tokenField:didEnterText:)]) {
         if ([textField.text length]) {
             [self.delegate tokenField:self didEnterText:textField.text];
@@ -622,6 +627,10 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
         [self isBackspacePressInTextField:textField range:range replacementString:string]) {
         [self textFieldDidEnterBackspace:(VENBackspaceTextField *)textField];
         return NO;
+    }
+
+    if (textField != self.inputTextField) {
+        return YES;
     }
 
     [self unhighlightAllTokens];
