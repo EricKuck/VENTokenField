@@ -394,6 +394,7 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
     [self.invisibleTextField setAutocorrectionType:self.autocorrectionType];
     [self.invisibleTextField setAutocapitalizationType:self.autocapitalizationType];
     self.invisibleTextField.backspaceDelegate = self;
+    self.invisibleTextField.delegate = self;
     [self addSubview:self.invisibleTextField];
 }
 
@@ -600,6 +601,10 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
+    if (textField == self.invisibleTextField) {
+        return NO;
+    }
+
     if ([self.delegate respondsToSelector:@selector(tokenField:didEnterText:)]) {
         if ([textField.text length]) {
             [self.delegate tokenField:self didEnterText:textField.text];
@@ -618,8 +623,23 @@ static const CGFloat VENTokenFieldDefaultMaxHeight          = 150.0;
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
-    if ([textField isKindOfClass:[VENBackspaceTextField class]] &&
-        [self isBackspacePressInTextField:textField range:range replacementString:string]) {
+    if (textField == self.invisibleTextField) {
+        BOOL didDeleteToken = NO;
+        for (VENToken *token in self.tokens) {
+            if (token.highlighted) {
+                [self.delegate tokenField:self didDeleteTokenAtIndex:[self.tokens indexOfObject:token]];
+                didDeleteToken = YES;
+                break;
+            }
+        }
+        if (didDeleteToken) {
+            [self setCursorVisibility];
+        }
+
+        return YES;
+    }
+
+    if ([textField isKindOfClass:[VENBackspaceTextField class]] && [self isBackspacePressInTextField:textField range:range replacementString:string]) {
         [self textFieldDidEnterBackspace:(VENBackspaceTextField *)textField];
         return NO;
     }
